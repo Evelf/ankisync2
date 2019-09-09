@@ -26,10 +26,13 @@ class Anki2:
             ])
             self.fix()
 
-        for n in db.Notes.select(db.Notes.flds, db.Models) \
-                .join(db.Models, on=(db.Models.id == db.Notes.mid)):
-            n.data = dict(zip(n.flds, n.model.flds))
-            n.save()
+        # This never ends, still have to investigate
+        # Is it useful??
+        #
+        # for n in db.Notes.select(db.Notes.flds, db.Models) \
+        #        .join(db.Models, on=(db.Models.id == db.Notes.mid)):
+        #    n.data = dict(zip(n.flds, n.model.flds))
+        #    n.save()
 
     def __iter__(self):
         for c in db.Cards.select(db.Cards, db.Decks, db.Notes, db.Models) \
@@ -77,13 +80,9 @@ class Anki2:
         c.models = models
         c.save()
 
-        self.db.drop_tables([
-            db.Decks, db.Models, db.Templates
-        ])
-        for n in db.Notes.select():
-            if n.data:
-                n.data = ""
-                n.save()
+        self.db.commit()
+        self.db.close()
+        self.db.drop_tables([db.Decks, db.Models, db.Templates])
 
 
 class Apkg(Anki2):
@@ -142,8 +141,8 @@ class Apkg(Anki2):
         if any(sep in archive_name for sep in {"/", "\\"}):
             raise ValueError("Media name does not support sub-folders")
 
-        if str(file_path) != str(self.folder.joinpath(archive_name)):
-            shutil.copy(str(file_path), str(self.folder.joinpath(archive_name)))
+        if str(file_path) != str(self.folder.joinpath(str(file_id))):
+            shutil.copy(str(file_path), str(self.folder.joinpath(str(file_id))))
 
         media[str(file_id)] = archive_name
 
