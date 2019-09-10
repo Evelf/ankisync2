@@ -230,32 +230,28 @@ def notes_pre_save(model_class, instance, created):
 
     if instance.fields:
         model = instance.model
-        keys = model.flds
         sfdl_key = model.get_sfld_key()
-        is_keys_updated = False
-        inst_flds = instance.flds or []
+        new_flds = []
 
-        for k in instance.fields.keys():
-            if k not in keys:
-                keys.append(k)
-                is_keys_updated = True
-        if is_keys_updated:
-            model.flds = keys
-            model.save()
-        instance.flds = []
+        # todo: à revoir, si on a updaté les fields du model etc.
+        # for k in instance.fields.keys():
+        #     if k not in keys:
+        #         keys.append(k)
+        #         is_keys_updated = True
+        # if is_keys_updated:
+        #     model.flds = keys
+        #     model.save()
         for idx, key in enumerate(model.flds):
-            # import ipdb; ipdb.set_trace()
             field_value = None
             if key in instance.fields:
                 field_value = str(instance.fields[key])
-            elif idx in inst_flds:
-                field_value = inst_flds[idx]
             else:
-                field_value = " "
-            instance.flds.append(field_value)
+                field_value = instance.flds[idx]
             if key == sfdl_key:
                 instance.sfld = stripHTMLMedia(field_value)
                 instance.csum = field_checksum(instance.sfld)
+            new_flds.append(field_value)
+        instance.flds = new_flds
         instance.fields = dict()
 
 
