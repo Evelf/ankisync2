@@ -54,7 +54,8 @@ class JSONField(pv.TextField):
 # Missing tables in Anki
 
 class Decks(BaseModel):
-    id = pv.AutoField()     # Use auto-increment instead of time in Epoch seconds to ensure uniqueness
+    id = pv.AutoField(primary_key=True) # Use auto-increment instead of time
+                                        # in Epoch seconds to ensure uniqueness
     name = pv.TextField(unique=True)
 
 
