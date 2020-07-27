@@ -246,6 +246,8 @@ def notes_pre_save(model_class, instance, created):
             field_value = None
             if key in instance.fields:
                 field_value = str(instance.fields[key])
+            elif created:
+                field_value = ""
             else:
                 field_value = instance.flds[idx]
             if key == sfdl_key:

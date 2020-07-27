@@ -46,8 +46,11 @@ class Anki2:
     def fix():
         c = db.Col.get()
 
+        d_created = {}
         for d in c.decks.values():
-            db.Decks.create(id=d["id"], name=d["name"])
+            if d["name"] not in d_created:
+                db.Decks.create(id=d["id"], name=d["name"])
+                d_created[d["name"]] = True
 
         for m in c.models.values():
             db.Models.create(id=m["id"], name=m["name"], flds=[f["name"] for f in m["flds"]], css=m["css"])
